@@ -22,7 +22,8 @@ void setup() {
   digitalWrite(LED_G, LED_OFF);
   digitalWrite(LED_B, LED_OFF);
 
-  init_pm(onStatusChange);
+  //init_pm(NULL); //for polling method
+  init_pm(onStatusChange); //call onStatusChange when air quality status change
 }
 
 void loop() {

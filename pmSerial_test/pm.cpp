@@ -14,6 +14,7 @@ String cal_AQ(uint16_t pm25_reading, uint16_t pm10_reading);
 // initalise pm2.5 sensor
 // using the pms5003
 void init_pm(void (*onChange)(void)){
+  Serial.print("init pm... ");
   // initalise serial port for sensor
 //  pmSerial.begin(9600, SERIAL_8N1, PM_RX, PM_TX);
 //  pms.init();
@@ -26,7 +27,7 @@ void init_pm(void (*onChange)(void)){
     1,                     /* Priority of the task. */
     NULL                   /* Task handle. */
   );  
-  (*onChange)();
+  Serial.println("done");
 }
 
 void read_pm_task(void * parameter){
@@ -53,7 +54,7 @@ void read_pm_task(void * parameter){
     cal_AQ(pms.pm25, pms.pm10);
     if(last_air_quality_status != air_quality_status){
       last_air_quality_status = air_quality_status;
-      onStatusChange();
+      if(onStatusChange != NULL) onStatusChange();
     }
     delay(PM_R_INT);
   }

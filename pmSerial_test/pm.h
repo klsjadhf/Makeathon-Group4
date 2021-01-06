@@ -12,7 +12,7 @@
   #define PM_RX 19
 
   // ms between each reading
-  #define PM_R_INT 1000
+  #define PM_R_INT 500
 
   enum AIR_QUALITY{
     GOOD,

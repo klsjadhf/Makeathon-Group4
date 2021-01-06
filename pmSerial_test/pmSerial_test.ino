@@ -1,4 +1,5 @@
 #include "pm.h"
+#include "lcdgfx.h"
 
 #define PM_THRES_LOW 50
 #define PM_THRES_MED 100
@@ -12,6 +13,21 @@
 #define LED_ON LOW
 #define LED_OFF HIGH
 
+// oled
+#define OLED_TYPE DisplaySSD1306_128x64_I2C
+#define OLED_ADDR 0x3C
+#define I2C_SDA 27
+#define I2C_SDL 26
+#define I2C_FREQ 400000
+/*rstPin, SPlatformI2cConfig{ config.busId,
+                                     static_cast<uint8_t>(config.addr ?: 0x3C),
+                                     config.scl,
+                                     config.sda,
+                                     config.frequency ?: 400000 } ) {}
+                                     */
+
+OLED_TYPE display(-1,{-1,OLED_ADDR,I2C_SDA,I2C_SDL,I2C_FREQ});
+
 void setup() {
   Serial.begin(9600);
   
@@ -21,6 +37,10 @@ void setup() {
   digitalWrite(LED_R, LED_OFF);
   digitalWrite(LED_G, LED_OFF);
   digitalWrite(LED_B, LED_OFF);
+
+  display.setFixedFont( ssd1306xled_font6x8 );
+  display.begin();
+  display.clear();
 
   //init_pm(NULL); //for polling method
   init_pm(onStatusChange); //call onStatusChange when air quality status change
@@ -38,6 +58,13 @@ void loop() {
 
 void onStatusChange(void){
   Serial.printf("status changed to: %s\n",air_quality_str.c_str());
+
+//  display.setFixedFont( ssd1306xled_font6x8 );
+//  display.begin();
+  display.clear();
+  display.printFixed(0, 8, "Air quality: ", STYLE_NORMAL);
+  display.printFixed(0, 16, air_quality_str.c_str(), STYLE_NORMAL);
+  
   if(air_quality_status == GOOD)
     pm_ok();
   else if(air_quality_status == MODERATE)

@@ -9,6 +9,7 @@ in pm.h, put `#define PM_DEBUG 1` to enable debug messages to serial
 async method  
 in `setup()` put `init_pm(function)` where `function` is the function to be called when the air quality status changes.  
 time between each reading can be changed in pm.h. default is `#define PM_R_INT 500` (500 milliseconds)  
+try not to use `bot.getUpdates()` or `bot.sendMessage()` in the function. the 2 functions take a few seconds to run and cause program to hang.(tls handshake problem)  
 
 polling method  
 in `setup()` put `init_pm(NULL)`  

@@ -7,7 +7,7 @@ in pm.h, put `#define PM_DEBUG 1` to enable debug messages to serial
 2 ways to use. async method and polling method.  
 
 async method  
-in `setup()` put `init_pm(function)` where `function` is the `function` to be called when the air quality status changes.  
+in `setup()` put `init_pm(function)` where `function` is the function to be called when the air quality status changes.  
 time between each reading can be changed in pm.h. default is `#define PM_R_INT 500` (500 milliseconds)  
 
 polling method  

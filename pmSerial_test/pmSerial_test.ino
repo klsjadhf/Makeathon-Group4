@@ -13,7 +13,7 @@
 #define WIFI_PASSWORD "YOUR_PASSWORD"
 // Telegram BOT Token (Get from Botfather)
 #define BOT_TOKEN "XXXXXXXXX:XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
-String chat_id = "123456789";
+String chat_id = "123456789"; //replace with your chat id
 WiFiClientSecure secured_client;
 UniversalTelegramBot bot(BOT_TOKEN, secured_client);
 bool sendMsg = 0;
@@ -72,18 +72,17 @@ void setup() {
   display.printFixed(0, 24, WIFI_SSID, STYLE_NORMAL);
   delay(1000);
 
-  Serial.print("Retrieving time: ");
-  configTime(0, 0, "pool.ntp.org"); // get UTC time via NTP
-  time_t now = time(nullptr);
-  while (now < 24 * 3600)
-  {
-    Serial.print(".");
-    delay(100);
-    now = time(nullptr);
-  }
-  Serial.println(now);
+//  Serial.print("Retrieving time: ");
+//  configTime(0, 0, "pool.ntp.org"); // get UTC time via NTP
+//  time_t now = time(nullptr);
+//  while (now < 24 * 3600)
+//  {
+//    Serial.print(".");
+//    delay(100);
+//    now = time(nullptr);
+//  }
+//  Serial.println(now);
 
-  
   //init_pm(NULL); //for polling method
   init_pm(onStatusChange); //call onStatusChange when air quality status change
 }

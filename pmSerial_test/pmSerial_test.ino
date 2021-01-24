@@ -30,7 +30,7 @@ bool sendMsg = 0;
 #define OLED_TYPE DisplaySSD1306_128x64_I2C
 #define OLED_ADDR 0x3C
 #define I2C_SDA 27
-#define I2C_SDL 26
+#define I2C_SCL 26
 #define I2C_FREQ 400000
 /*rstPin, SPlatformI2cConfig{ config.busId,
                                      static_cast<uint8_t>(config.addr ?: 0x3C),
@@ -39,7 +39,7 @@ bool sendMsg = 0;
                                      config.frequency ?: 400000 } ) {}
                                      */
 
-OLED_TYPE display(-1,{-1,OLED_ADDR,I2C_SDA,I2C_SDL,I2C_FREQ});
+OLED_TYPE display(-1,{-1,OLED_ADDR,I2C_SCL,I2C_SDA,I2C_FREQ});
 
 void setup() {
   Serial.begin(9600);
@@ -56,20 +56,33 @@ void setup() {
   display.clear();
 
    // attempt to connect to Wifi network:
-  Serial.print("Connecting to Wifi SSID ");
+  Serial.print("Connecting to Wifi \nSSID :");
   display.printFixed(0, 8, "Connecting WiFi...", STYLE_NORMAL);
   Serial.print(WIFI_SSID);
   WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
   secured_client.setCACert(TELEGRAM_CERTIFICATE_ROOT); // Add root certificate for api.telegram.org
-  while (WiFi.status() != WL_CONNECTED)
-  {
+//  while (WiFi.status() != WL_CONNECTED)
+//  {
+//    Serial.print(".");
+//    delay(500);
+//  }
+  for (int i=0; i<10; i++){
+    if(WiFi.status() == WL_CONNECTED){
+      break;
+    }
     Serial.print(".");
     delay(500);
   }
-  Serial.print("\nWiFi connected. IP address: ");
-  Serial.println(WiFi.localIP());
-  display.printFixed(0, 16, "Connected to: ", STYLE_NORMAL);
-  display.printFixed(0, 24, WIFI_SSID, STYLE_NORMAL);
+  if(WiFi.status() == WL_CONNECTED){
+    Serial.print("\nWiFi connected. IP address: ");
+    Serial.println(WiFi.localIP());
+    display.printFixed(0, 16, "Connected to: ", STYLE_NORMAL);
+    display.printFixed(0, 24, WIFI_SSID, STYLE_NORMAL);
+  }
+  else{
+    Serial.print("\nWiFi Failed");
+    display.printFixed(0, 16, "WiFi Failed", STYLE_NORMAL);
+  }
   delay(1000);
 
 //  Serial.print("Retrieving time: ");
@@ -113,14 +126,16 @@ void onStatusChange(void){
   display.printFixed(0, 16, air_quality_str.c_str(), STYLE_NORMAL);
 
 //  bot.sendMessage(chat_id, "Air quality: "+air_quality_str, "");
-  sendMsg = 1; //sending message taking too long
+//  sendMsg = 1; //sending message taking too long
   
   if(air_quality_status == GOOD)
     pm_ok();
   else if(air_quality_status == MODERATE)
     pm_warn();
-  else
+  else{
     pm_danger();
+    sendMsg = 1;
+  }
 }
 
 void pm_ok(void){

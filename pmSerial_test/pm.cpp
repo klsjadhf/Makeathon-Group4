@@ -17,7 +17,7 @@ void init_pm(void (*onChange)(void)){
   Serial.print("init pm... ");
   // initalise serial port for sensor
 //  pmSerial.begin(9600, SERIAL_8N1, PM_RX, PM_TX);
-//  pms.init();
+  pms.init();
   // create new task to continuously read the pm2.5 sensor and update struct
   xTaskCreatePinnedToCore(
     read_pm_task,          /* Task function. */
@@ -34,11 +34,11 @@ void init_pm(void (*onChange)(void)){
 void read_pm_task(void * parameter){
   while(1){
     void (*onStatusChange)(void) = (void (*)(void))parameter;
-    pms.pm25 = analogRead(34)/15;
-    Serial.printf("analogread: %d\n",pms.pm25);
-//    pms.read(); // read the PM s
+//    pms.pm25 = analogRead(34)/15;
+//    Serial.printf("analogread: %d\n",pms.pm25);
+    pms.read(); // read the PM s
     #if PM_DEBUG
-      Serial.print("Reading sensor. Status: ");
+      Serial.print("\nReading sensor. Status: ");
       if (pms){ // successfull read sensor
         Serial.println("Ok");
         // print formatted results

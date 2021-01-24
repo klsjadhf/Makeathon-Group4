@@ -1,6 +1,5 @@
-using analog input to test code.  
-for actual sensor, uncomment lines 20, 39 and comment lines 37, 38 in pm.cpp  
-using uart1, tx -> pin 18, rx -> pin19  
+using analog input to test code.   
+using uart1, tx -> pin 32, rx -> pin 33  
 pin connection can be changed in pm.h  
 in pm.h, put `#define PM_DEBUG 1` to enable debug messages to serial  
 

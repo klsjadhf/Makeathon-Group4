@@ -14,6 +14,7 @@
 // Telegram BOT Token (Get from Botfather)
 #define BOT_TOKEN "XXXXXXXXX:XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
 String chat_id = "123456789"; //replace with your chat id
+
 WiFiClientSecure secured_client;
 UniversalTelegramBot bot(BOT_TOKEN, secured_client);
 bool sendMsg = 0;
@@ -61,11 +62,6 @@ void setup() {
   Serial.print(WIFI_SSID);
   WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
   secured_client.setCACert(TELEGRAM_CERTIFICATE_ROOT); // Add root certificate for api.telegram.org
-//  while (WiFi.status() != WL_CONNECTED)
-//  {
-//    Serial.print(".");
-//    delay(500);
-//  }
   for (int i=0; i<10; i++){
     if(WiFi.status() == WL_CONNECTED){
       break;
@@ -85,42 +81,32 @@ void setup() {
   }
   delay(1000);
 
-//  Serial.print("Retrieving time: ");
-//  configTime(0, 0, "pool.ntp.org"); // get UTC time via NTP
-//  time_t now = time(nullptr);
-//  while (now < 24 * 3600)
-//  {
-//    Serial.print(".");
-//    delay(100);
-//    now = time(nullptr);
-//  }
-//  Serial.println(now);
-
   //init_pm(NULL); //for polling method
   init_pm(onStatusChange); //call onStatusChange when air quality status change
 }
 
 void loop() {
+  //for polling method
 //  if(pms.pm25 < PM_THRES_LOW)
 //    pm_ok();
 //  else if(pms.pm25 > PM_THRES_HIGH)
 //    pm_danger();
 //  else
 //    pm_warn();
+//  delay(500);
+
+
   if(sendMsg){
     sendMsg = 0;
     Serial.println("sending message... ");
     bot.sendMessage(chat_id, "Air quality: "+air_quality_str, "");
     Serial.println("message sent");
   }
-//  delay(500);
 }
 
 void onStatusChange(void){
   Serial.printf("status changed to: %s\n",air_quality_str.c_str());
 
-//  display.setFixedFont( ssd1306xled_font6x8 );
-//  display.begin();
   display.clear();
   display.printFixed(0, 8, "Air quality: ", STYLE_NORMAL);
   display.printFixed(0, 16, air_quality_str.c_str(), STYLE_NORMAL);
@@ -134,7 +120,6 @@ void onStatusChange(void){
     pm_warn();
   else{
     pm_danger();
-    sendMsg = 1;
   }
 }
 
@@ -171,4 +156,5 @@ void pm_danger(void){
 
   //oled stuff here
   //telegram stuff here
+  sendMsg = 1;
 }

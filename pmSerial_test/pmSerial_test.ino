@@ -29,7 +29,7 @@ bool sendMsg = 0;
 
 OLED_TYPE display(-1,{-1,OLED_ADDR,I2C_SCL,I2C_SDA,I2C_FREQ});
 
-void setup() {
+void setup() {  
   Serial.begin(9600);
 
   init_led();

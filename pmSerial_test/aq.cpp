@@ -12,6 +12,7 @@ void begin_aq(void (*onChange)(void)){
 
   //initalize air quality sensors
   init_pm();
+  init_ccs();
   
   xTaskCreate(
     check_status_task,          /* Task function. */
@@ -28,6 +29,7 @@ void check_status_task(void * parameter){
     void (*onStatusChange)(void) = (void (*)(void))parameter;
   
     cal_AQ(pms.pm25, pms.pm10);
+//    cal_AQ(pms.pm25, pms.pm10, ccs.geteCO2(), ccs.getTVOC());
     
     if(last_air_quality_status != air_quality_status){
       last_air_quality_status = air_quality_status;
@@ -82,7 +84,35 @@ String cal_AQ(uint16_t pm25_reading, uint16_t pm10_reading){
   #if AQ_DEBUG 
     Serial.printf("pm25_sub: %d, pm10_sub: %d, PSI: %d\n", pm25_sub, pm10_sub, PSI);
     Serial.printf("Air quality is %s\n", air_quality_str.c_str());
-  #endif
+  #endif //AQ_DEBUG
 
   return air_quality_str;
+}
+
+AIR_QUALITY cal_voc(uint16_t eco2, uint16_t tvoc){
+  AIR_QUALITY quality;
+  int i;
+  const int thres_levels = 3;
+  uint16_t eco2_thres[thres_levels] = {500, 1000, 1500};
+  uint16_t tvoc_thres[thres_levels] = {10, 15, 20};
+
+  #if AQ_DEBUG 
+    Serial.printf("eco2: %d, tvoc: %d\n", eco2, tvoc);
+  #endif //AQ_DEBUG
+
+  for(i = 0; i<thres_levels; i++){
+    #if AQ_DEBUG 
+      Serial.printf("eco2_thres: %d, tvoc_thres: %d, i: %d\n", eco2_thres[i], tvoc_thres[i], i);
+    #endif //AQ_DEBUG
+    if(eco2<eco2_thres[i] || tvoc<tvoc_thres[i]){
+      break;
+    }
+  }
+  quality = (AIR_QUALITY)i;
+  
+  #if AQ_DEBUG 
+    Serial.printf("eco2: %d, tvoc: %d, quality: %d\n", eco2, tvoc, quality);
+  #endif //AQ_DEBUG
+
+  return quality;
 }

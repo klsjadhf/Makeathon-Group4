@@ -47,7 +47,7 @@ void read_pm_task(void * parameter){
       }
       else
         print_pm_error(pms.status);
-    #endif
+    #endif //PM_DEBUG
 //    cal_AQ(pms.pm25, pms.pm10);
 //    if(last_air_quality_status != air_quality_status){
 //      last_air_quality_status = air_quality_status;

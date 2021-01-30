@@ -3,6 +3,7 @@
 
   #include <Arduino.h>
   #include "pm.h"
+  #include "ccs.h"
 
   #define AQ_DEBUG 1
 

@@ -17,6 +17,6 @@
 
   extern Adafruit_CCS811 ccs;
 
-  void init_ccs(void);
+  int init_ccs(void);
 
 #endif

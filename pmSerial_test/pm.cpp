@@ -34,7 +34,7 @@ void read_pm_task(void * parameter){
 //    Serial.printf("analogread: %d\n",pms.pm25);
     pms.read(); // read the PM s
     #if PM_DEBUG
-      Serial.print("\nReading sensor. Status: ");
+      Serial.print("\nReading PMS5003. Status: ");
       if (pms){ // successfull read sensor
         Serial.println("Ok");
         // print formatted results

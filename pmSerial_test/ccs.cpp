@@ -4,12 +4,12 @@ Adafruit_CCS811 ccs;
 
 void read_ccs_task(void * parameter);
 
-void init_ccs(void){
+int init_ccs(void){
   Serial.println("init CCS811");
 
   if(!ccs.begin()){
     Serial.println("Failed to start sensor! Please check your wiring.");
-    while(1);
+    return -1;
   }
 
   xTaskCreatePinnedToCore(
@@ -21,6 +21,7 @@ void init_ccs(void){
     NULL,                  /* Task handle. */
     1                      // pin to core 1 (i2c begin was called from core 1, interrupt has to be processed on core 1)
   );  
+  return 0;
 }
 
 void read_ccs_task(void * parameter){
@@ -36,8 +37,7 @@ void read_ccs_task(void * parameter){
       }
     }
     else{
-      Serial.println("ERROR!");
-      while(1);
+      Serial.println("CCS811: ERROR!");
     }
     delay(CCS_R_INT);
   }

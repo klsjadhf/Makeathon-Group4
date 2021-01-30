@@ -5,10 +5,12 @@ AIR_QUALITY air_quality_status = AQ_ERROR;
 AIR_QUALITY last_air_quality_status = AQ_ERROR;
 
 void check_status_task(void * parameter);
-String cal_AQ(uint16_t pm25_reading, uint16_t pm10_reading);
+AIR_QUALITY cal_PM_quality(uint16_t pm25_reading, uint16_t pm10_reading);
+AIR_QUALITY cal_voc_quality(uint16_t eco2, uint16_t tvoc);
+String AQtoS(AIR_QUALITY aq);
 
 void begin_aq(void (*onChange)(void)){
-  Serial.print("begin aq");
+  Serial.println("begin aq");
 
   //initalize air quality sensors
   init_pm();
@@ -27,21 +29,36 @@ void begin_aq(void (*onChange)(void)){
 void check_status_task(void * parameter){
   while(1){
     void (*onStatusChange)(void) = (void (*)(void))parameter;
+
+    char inStr[10]={0};
+    Serial.print("Enter val: ");
+    while(!Serial.available())delay(10);
+    Serial.readBytesUntil('\n', inStr, 10);
+    int inVal = atoi(inStr);
+    Serial.printf("Entered: %d\n", inVal);
+
+    air_quality_status = cal_voc_quality(inVal, 0);
   
-    cal_AQ(pms.pm25, pms.pm10);
-//    cal_AQ(pms.pm25, pms.pm10, ccs.geteCO2(), ccs.getTVOC());
+//    cal_AQ(pms.pm25, pms.pm10);
+//    air_quality_status = max(cal_PM_quality(pms.pm25, pms.pm10), cal_voc_quality(ccs.geteCO2(), ccs.getTVOC()));
+    air_quality_str = AQtoS(air_quality_status);
     
     if(last_air_quality_status != air_quality_status){
       last_air_quality_status = air_quality_status;
       if(onStatusChange != NULL) onStatusChange();
     }
+
+    #if AQ_DEBUG 
+      Serial.printf("last status: %d, current status: %d, %s\n", last_air_quality_status, air_quality_status, air_quality_str.c_str());
+    #endif //AQ_DEBUG
   }
   vTaskDelete(NULL);
 }
 
 // calculates the air quality based on following link (need to do 24 hr avg?)
 // https://www.haze.gov.sg/docs/default-source/faq/computation-of-the-pollutant-standards-index-%28psi%29.pdf
-String cal_AQ(uint16_t pm25_reading, uint16_t pm10_reading){
+AIR_QUALITY cal_PM_quality(uint16_t pm25_reading, uint16_t pm10_reading){
+  AIR_QUALITY aq;
   const int pm25[] = {0, 12, 55, 150, 250, 350, 500};
   const int pm10[] = {0, 50, 150, 350, 420, 500, 600};
   const int psi[] = {0, 50, 100, 200, 300, 400 ,500};
@@ -59,60 +76,93 @@ String cal_AQ(uint16_t pm25_reading, uint16_t pm10_reading){
   int pm10_sub = round(((float)(psi[i]-psi[i-1])/(float)(pm10[i]-pm10[i-1]))*(float)(pm10_reading-pm10[i-1]))+psi[i-1];
 
   int PSI = max(pm25_sub, pm10_sub);
+
+  for(i=1; i<=5; i++){
+    if(PSI<psi[i]){
+      Serial.println(i);
+      break;
+    }
+  }
+  aq = (AIR_QUALITY)(i-1);
   
-  if(PSI<psi[1]){
-    air_quality_str = "Good";
-    air_quality_status = GOOD;
-  }
-  else if(PSI<psi[2]){
-    air_quality_str = "Moderate";
-    air_quality_status = MODERATE;
-  }
-  else if(PSI<psi[3]){
-    air_quality_str = "Unhealthy";
-    air_quality_status = UNHEALTHY;
-  }
-  else if(PSI<psi[4]){
-    air_quality_str = "Very Unhealthy";
-    air_quality_status = V_UNHEALTHY;
-  }
-  else{
-    air_quality_str = "Hazardous";
-    air_quality_status = HAZARDOUS;
-  }
+//  if(PSI<psi[1]){
+//    air_quality_str = "Good";
+//    air_quality_status = GOOD;
+//  }
+//  else if(PSI<psi[2]){
+//    air_quality_str = "Moderate";
+//    air_quality_status = MODERATE;
+//  }
+//  else if(PSI<psi[3]){
+//    air_quality_str = "Unhealthy";
+//    air_quality_status = UNHEALTHY;
+//  }
+//  else if(PSI<psi[4]){
+//    air_quality_str = "Very Unhealthy";
+//    air_quality_status = V_UNHEALTHY;
+//  }
+//  else{
+//    air_quality_str = "Hazardous";
+//    air_quality_status = HAZARDOUS;
+//  }
 
   #if AQ_DEBUG 
     Serial.printf("pm25_sub: %d, pm10_sub: %d, PSI: %d\n", pm25_sub, pm10_sub, PSI);
-    Serial.printf("Air quality is %s\n", air_quality_str.c_str());
+    Serial.printf("Air quality is %d\n", aq);
   #endif //AQ_DEBUG
 
-  return air_quality_str;
+  return aq;
 }
 
-AIR_QUALITY cal_voc(uint16_t eco2, uint16_t tvoc){
-  AIR_QUALITY quality;
-  int i;
-  const int thres_levels = 3;
-  uint16_t eco2_thres[thres_levels] = {500, 1000, 1500};
-  uint16_t tvoc_thres[thres_levels] = {10, 15, 20};
+AIR_QUALITY cal_voc_quality(uint16_t eco2, uint16_t tvoc){
+  AIR_QUALITY aq;
+  int i,j;
+  const int thres_num = 3;
+  uint16_t eco2_thres[thres_num] = {500, 1000, 1500};
+  uint16_t tvoc_thres[thres_num] = {10, 15, 20};
 
   #if AQ_DEBUG 
     Serial.printf("eco2: %d, tvoc: %d\n", eco2, tvoc);
   #endif //AQ_DEBUG
 
-  for(i = 0; i<thres_levels; i++){
+  for(i = 0; i<thres_num; i++){
     #if AQ_DEBUG 
-      Serial.printf("eco2_thres: %d, tvoc_thres: %d, i: %d\n", eco2_thres[i], tvoc_thres[i], i);
+      Serial.printf("eco2_thres: %d, i: %d\n", eco2_thres[i], i);
     #endif //AQ_DEBUG
-    if(eco2<eco2_thres[i] || tvoc<tvoc_thres[i]){
+    if(eco2<eco2_thres[i]){
       break;
     }
   }
-  quality = (AIR_QUALITY)i;
+  for(j = 0; j<thres_num; j++){
+    #if AQ_DEBUG 
+      Serial.printf("tvoc_thres: %d, i: %d\n", tvoc_thres[i], i);
+    #endif //AQ_DEBUG
+    if(tvoc<tvoc_thres[i]){
+      break;
+    }
+  }
+  aq = (AIR_QUALITY)max(i, j);
   
   #if AQ_DEBUG 
-    Serial.printf("eco2: %d, tvoc: %d, quality: %d\n", eco2, tvoc, quality);
+    Serial.printf("eco2: %d, tvoc: %d, quality: %d\n", eco2, tvoc, aq);
   #endif //AQ_DEBUG
 
-  return quality;
+  return aq;
+}
+
+String AQtoS(AIR_QUALITY aq){
+  switch(aq){
+    case GOOD:
+      return "Good";
+    case MODERATE:
+      return "Moderate";
+    case UNHEALTHY:
+      return "Unhealthy";
+    case V_UNHEALTHY:
+      return "Very Unhealthy";
+    case HAZARDOUS:
+      return "Hazardous";
+    default:
+      return "Error";
+  };
 }

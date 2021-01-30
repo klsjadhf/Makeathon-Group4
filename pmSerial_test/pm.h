@@ -1,6 +1,7 @@
-#ifndef __PM_H
-#define __PM_H
+#ifndef _PM_H_
+#define _PM_H_
 
+  #include <Arduino.h>
   #include <PMserial.h>
 
   #define PM_DEBUG 1
@@ -14,18 +15,8 @@
   // ms between each reading
   #define PM_R_INT 500
 
-  enum AIR_QUALITY{
-    GOOD,
-    MODERATE,
-    UNHEALTHY,
-    V_UNHEALTHY,
-    HAZARDOUS,
-  };
-
   extern SerialPM pms;
-  extern String air_quality_str;
-  extern int air_quality_status;
 
-  void init_pm(void (*onChange)(void));
+  void init_pm(void);
 
 #endif

@@ -1,4 +1,6 @@
-#include "pm.h"
+#include "info.h"
+#include "aq.h"
+#include "led.h"
 #include "lcdgfx.h"
 #include <WiFi.h>
 #include <WiFiClientSecure.h>
@@ -8,24 +10,9 @@
 #define PM_THRES_MED 100
 #define PM_THRES_HIGH 150
 
-// Wifi network station credentials
-#define WIFI_SSID "YOUR_SSID"
-#define WIFI_PASSWORD "YOUR_PASSWORD"
-// Telegram BOT Token (Get from Botfather)
-#define BOT_TOKEN "XXXXXXXXX:XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
-String chat_id = "123456789"; //replace with your chat id
-
 WiFiClientSecure secured_client;
 UniversalTelegramBot bot(BOT_TOKEN, secured_client);
 bool sendMsg = 0;
-
-//pins for rgb led
-#define LED_R 13
-#define LED_G 12
-#define LED_B 14
-//using active low led
-#define LED_ON LOW
-#define LED_OFF HIGH
 
 // oled
 #define OLED_TYPE DisplaySSD1306_128x64_I2C
@@ -44,13 +31,8 @@ OLED_TYPE display(-1,{-1,OLED_ADDR,I2C_SCL,I2C_SDA,I2C_FREQ});
 
 void setup() {
   Serial.begin(9600);
-  
-  pinMode(LED_R, OUTPUT);
-  pinMode(LED_G, OUTPUT);
-  pinMode(LED_B, OUTPUT);
-  digitalWrite(LED_R, LED_OFF);
-  digitalWrite(LED_G, LED_OFF);
-  digitalWrite(LED_B, LED_OFF);
+
+  init_led();
 
   display.setFixedFont( ssd1306xled_font6x8 );
   display.begin();
@@ -81,8 +63,9 @@ void setup() {
   }
   delay(1000);
 
+  begin_aq(onStatusChange);
   //init_pm(NULL); //for polling method
-  init_pm(onStatusChange); //call onStatusChange when air quality status change
+//  init_pm(onStatusChange); //call onStatusChange when air quality status change
 }
 
 void loop() {
@@ -118,18 +101,18 @@ void onStatusChange(void){
     pm_ok();
   else if(air_quality_status == MODERATE)
     pm_warn();
-  else{
+  else
     pm_danger();
-  }
 }
 
 void pm_ok(void){
   Serial.println("pm ok");
   
   //set green colour
-  digitalWrite(LED_R, LED_OFF);
-  digitalWrite(LED_G, LED_ON);
-  digitalWrite(LED_B, LED_OFF);
+  setLed(GREEN);
+//  digitalWrite(LED_R, LED_OFF);
+//  digitalWrite(LED_G, LED_ON);
+//  digitalWrite(LED_B, LED_OFF);
 
   //oled stuff here
   //telegram stuff here
@@ -138,9 +121,10 @@ void pm_warn(void){
   Serial.println("pm warning");
   
   //set yellow colour
-  digitalWrite(LED_R, LED_ON);
-  digitalWrite(LED_G, LED_ON);
-  digitalWrite(LED_B, LED_OFF);
+  setLed(YELLOW);
+//  digitalWrite(LED_R, LED_ON);
+//  digitalWrite(LED_G, LED_ON);
+//  digitalWrite(LED_B, LED_OFF);
 
   //oled stuff here
   //telegram stuff here
@@ -150,9 +134,10 @@ void pm_danger(void){
   Serial.println("pm danger");
   
   //set red colour
-  digitalWrite(LED_R, LED_ON);
-  digitalWrite(LED_G, LED_OFF);
-  digitalWrite(LED_B, LED_OFF);
+  setLed(RED);
+//  digitalWrite(LED_R, LED_ON);
+//  digitalWrite(LED_G, LED_OFF);
+//  digitalWrite(LED_B, LED_OFF);
 
   //oled stuff here
   //telegram stuff here

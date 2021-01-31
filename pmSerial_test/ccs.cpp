@@ -29,15 +29,15 @@ void read_ccs_task(void * parameter){
     if(ccs.available()){
       if(!ccs.readData()){
         #if CCS_DEBUG
-        Serial.print("\nCO2: ");
-        Serial.print(ccs.geteCO2());
-        Serial.print("ppm, TVOC: ");
-        Serial.println(ccs.getTVOC());
+          Serial.print("CO2: ");
+          Serial.print(ccs.geteCO2());
+          Serial.print("ppm, TVOC: ");
+          Serial.println(ccs.getTVOC());
         #endif //CCS_DEBUG
       }
-    }
-    else{
-      Serial.println("CCS811: ERROR!");
+      else{
+        Serial.println("ERROR!");
+      }
     }
     delay(CCS_R_INT);
   }

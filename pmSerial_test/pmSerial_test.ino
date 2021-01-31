@@ -17,9 +17,11 @@ bool sendMsg = 0;
 // oled
 #define OLED_TYPE DisplaySSD1306_128x64_I2C
 #define OLED_ADDR 0x3C
-#define I2C_SDA 27
-#define I2C_SCL 26
-#define I2C_FREQ 400000
+//#define I2C_SDA 27
+//#define I2C_SCL 26
+#define I2C_SDA 21
+#define I2C_SCL 22
+#define I2C_FREQ 100000
 /*rstPin, SPlatformI2cConfig{ config.busId,
                                      static_cast<uint8_t>(config.addr ?: 0x3C),
                                      config.scl,

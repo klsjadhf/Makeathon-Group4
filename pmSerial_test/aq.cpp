@@ -30,27 +30,28 @@ void check_status_task(void * parameter){
   while(1){
     void (*onStatusChange)(void) = (void (*)(void))parameter;
 
-    char inStr[10]={0};
-    Serial.print("Enter val: ");
-    while(!Serial.available())delay(10);
-    Serial.readBytesUntil('\n', inStr, 10);
-    int inVal = atoi(inStr);
-    Serial.printf("Entered: %d\n", inVal);
-
-    air_quality_status = cal_voc_quality(inVal, 0);
+//    char inStr[10]={0};
+//    Serial.print("Enter val: ");
+//    while(!Serial.available())delay(10);
+//    Serial.readBytesUntil('\n', inStr, 10);
+//    int inVal = atoi(inStr);
+//    Serial.printf("Entered: %d\n", inVal);
+//
+//    air_quality_status = cal_voc_quality(inVal, 0);
   
 //    cal_AQ(pms.pm25, pms.pm10);
-//    air_quality_status = max(cal_PM_quality(pms.pm25, pms.pm10), cal_voc_quality(ccs.geteCO2(), ccs.getTVOC()));
+    air_quality_status = max(cal_PM_quality(pms.pm25, pms.pm10), cal_voc_quality(ccs.geteCO2(), ccs.getTVOC()));
     air_quality_str = AQtoS(air_quality_status);
+
+    #if AQ_DEBUG 
+      Serial.printf("last status: %d, current status: %d, %s\n", last_air_quality_status, air_quality_status, air_quality_str.c_str());
+    #endif //AQ_DEBUG
     
     if(last_air_quality_status != air_quality_status){
       last_air_quality_status = air_quality_status;
       if(onStatusChange != NULL) onStatusChange();
     }
-
-    #if AQ_DEBUG 
-      Serial.printf("last status: %d, current status: %d, %s\n", last_air_quality_status, air_quality_status, air_quality_str.c_str());
-    #endif //AQ_DEBUG
+    delay(300);
   }
   vTaskDelete(NULL);
 }
@@ -118,8 +119,8 @@ AIR_QUALITY cal_voc_quality(uint16_t eco2, uint16_t tvoc){
   AIR_QUALITY aq;
   int i,j;
   const int thres_num = 3;
-  uint16_t eco2_thres[thres_num] = {500, 1000, 1500};
-  uint16_t tvoc_thres[thres_num] = {10, 15, 20};
+  uint16_t eco2_thres[thres_num] = {1000, 2000, 4000};
+  uint16_t tvoc_thres[thres_num] = {250, 2000, 4000};
 
   #if AQ_DEBUG 
     Serial.printf("eco2: %d, tvoc: %d\n", eco2, tvoc);

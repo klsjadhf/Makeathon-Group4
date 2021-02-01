@@ -1,6 +1,7 @@
 #include "info.h"
 #include "aq.h"
 #include "led.h"
+#include "batt.h"
 #include "lcdgfx.h"
 #include <WiFi.h>
 #include <WiFiClientSecure.h>
@@ -65,6 +66,7 @@ void setup() {
   }
   delay(1000);
 
+  init_batt(lowBatt);
   begin_aq(onStatusChange);
   //init_pm(NULL); //for polling method
 //  init_pm(onStatusChange); //call onStatusChange when air quality status change
@@ -86,6 +88,15 @@ void loop() {
     Serial.println("sending message... ");
     bot.sendMessage(chat_id, "Air quality: "+air_quality_str, "");
     Serial.println("message sent");
+  }
+}
+
+void lowBatt(void){
+  static unsigned long lastSentMillis = 0;
+//  if( millis()-lastSentMillis >= 600000){ //send warning every 10 mins if low battery
+  if( millis()-lastSentMillis >= 20000){
+    Serial.println("low battery");
+    bot.sendMessage(chat_id, "low battery");
   }
 }
 

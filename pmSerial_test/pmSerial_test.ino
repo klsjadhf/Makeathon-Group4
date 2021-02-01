@@ -98,6 +98,7 @@ void lowBatt(void){
     Serial.println("low battery");
     bot.sendMessage(chat_id, "low battery");
   }
+  blinkLed(LED_RED, 1);
 }
 
 void onStatusChange(void){
@@ -122,7 +123,7 @@ void pm_ok(void){
   Serial.println("pm ok");
   
   //set green colour
-  setLed(GREEN);
+  setLed(LED_GREEN);
 //  digitalWrite(LED_R, LED_OFF);
 //  digitalWrite(LED_G, LED_ON);
 //  digitalWrite(LED_B, LED_OFF);
@@ -134,7 +135,7 @@ void pm_warn(void){
   Serial.println("pm warning");
   
   //set yellow colour
-  setLed(YELLOW);
+  setLed(LED_YELLOW);
 //  digitalWrite(LED_R, LED_ON);
 //  digitalWrite(LED_G, LED_ON);
 //  digitalWrite(LED_B, LED_OFF);
@@ -147,7 +148,7 @@ void pm_danger(void){
   Serial.println("pm danger");
   
   //set red colour
-  setLed(RED);
+  setLed(LED_RED);
 //  digitalWrite(LED_R, LED_ON);
 //  digitalWrite(LED_G, LED_OFF);
 //  digitalWrite(LED_B, LED_OFF);

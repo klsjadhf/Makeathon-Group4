@@ -4,7 +4,7 @@
   #include <Arduino.h>
   #include <PMserial.h>
 
-  #define PM_DEBUG 1
+  #define PM_DEBUG 0
 
   // uart0 used for communication with pc
   // lib uses uart1. might need to change pins to avoid conflict with flash

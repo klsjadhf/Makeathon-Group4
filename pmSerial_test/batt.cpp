@@ -1,4 +1,5 @@
 #include "batt.h"
+#include "led.h"
 
 int getBatt(void);
 void battTask(void * parameter);
@@ -23,6 +24,9 @@ void battTask(void * parameter){
     if(getBatt() < LOW_BATT_THRES){
       if(onLowBatt != NULL) onLowBatt();
     }
+    else{
+      stopBlink();
+    }
     delay(POLL_INT);
   }
   vTaskDelete(NULL);
@@ -30,7 +34,7 @@ void battTask(void * parameter){
 
 int getBatt(void){
   int battLevel;
-    // voltage curve from https://blog.ampow.com/lipo-voltage-chart/
+  // voltage curve from https://blog.ampow.com/lipo-voltage-chart/
   const double voltage[] = {3.27, 3.61, 3.69, 3.71, 3.73, 3.75, 3.77, 3.79, 
                             3.8, 3.82, 3.84, 3.85, 3.87, 3.91, 3.95, 3.98, 
                             4.02, 4.08, 4.11, 4.15, 4.2};
@@ -63,5 +67,5 @@ int getBatt(void){
 }
 
 double mapf(double x, double in_min, double in_max, double out_min, double out_max){
-    return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+  return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
 }

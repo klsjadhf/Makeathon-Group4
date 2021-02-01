@@ -80,7 +80,9 @@ AIR_QUALITY cal_PM_quality(uint16_t pm25_reading, uint16_t pm10_reading){
 
   for(i=1; i<=5; i++){
     if(PSI<psi[i]){
+      #if AQ_DEBUG 
       Serial.println(i);
+      #endif
       break;
     }
   }

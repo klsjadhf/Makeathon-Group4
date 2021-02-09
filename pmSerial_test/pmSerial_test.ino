@@ -13,7 +13,8 @@
 
 WiFiClientSecure secured_client;
 UniversalTelegramBot bot(BOT_TOKEN, secured_client);
-bool sendMsg = 0;
+bool sendAqMsg = 0;
+bool sendLowBattMsg = 0;
 
 // oled
 #define OLED_TYPE DisplaySSD1306_128x64_I2C
@@ -83,10 +84,16 @@ void loop() {
 //  delay(500);
 
 
-  if(sendMsg){
-    sendMsg = 0;
+  if(sendAqMsg){
+    sendAqMsg = 0;
     Serial.println("sending message... ");
     bot.sendMessage(chat_id, "Air quality: "+air_quality_str, "");
+    Serial.println("message sent");
+  }
+  if(sendLowBattMsg){
+    sendLowBattMsg = 0;
+    Serial.println("sending message... ");
+    bot.sendMessage(chat_id, "low battery");
     Serial.println("message sent");
   }
 }
@@ -96,7 +103,8 @@ void lowBatt(void){
 //  if( millis()-lastSentMillis >= 600000){ //send warning every 10 mins if low battery
   if( millis()-lastSentMillis >= 20000){
     Serial.println("low battery");
-    bot.sendMessage(chat_id, "low battery");
+//    bot.sendMessage(chat_id, "low battery");
+    sendLowBattMsg = 1;
   }
   blinkLed(LED_RED, 1);
 }
@@ -109,7 +117,7 @@ void onStatusChange(void){
   display.printFixed(0, 16, air_quality_str.c_str(), STYLE_NORMAL);
 
 //  bot.sendMessage(chat_id, "Air quality: "+air_quality_str, "");
-//  sendMsg = 1; //sending message taking too long
+//  sendAqMsg = 1; //sending message taking too long
   
   if(air_quality_status == GOOD)
     pm_ok();
@@ -155,5 +163,5 @@ void pm_danger(void){
 
   //oled stuff here
   //telegram stuff here
-  sendMsg = 1;
+  sendAqMsg = 1;
 }

@@ -15,14 +15,13 @@ void init_pm(void){
 //  pmSerial.begin(9600, SERIAL_8N1, PM_RX, PM_TX);
   pms.init();
   // create new task to continuously read the pm2.5 sensor and update struct
-  xTaskCreatePinnedToCore(
+  xTaskCreate(
     read_pm_task,          /* Task function. */
     "read_pm_task",        /* String with name of task. */
     10000,                 /* Stack size in bytes. */
     NULL,       /* Parameter passed as input of the task */
     1,                     /* Priority of the task. */
-    NULL,                  /* Task handle. */
-    1                      // pin to core 1 (i2c begin was called from core 1, interrupt has to be processed on core 1)
+    NULL                   /* Task handle. */
   );  
   Serial.println("done");
 }

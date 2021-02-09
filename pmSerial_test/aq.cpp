@@ -16,13 +16,14 @@ void begin_aq(void (*onChange)(void)){
   init_pm();
   init_ccs();
   
-  xTaskCreate(
+  xTaskCreatePinnedToCore(
     check_status_task,          /* Task function. */
     "check_status_task",        /* String with name of task. */
     10000,                 /* Stack size in bytes. */
     (void*)onChange,       /* Parameter passed as input of the task */
     1,                     /* Priority of the task. */
-    NULL                  /* Task handle. */
+    NULL,                  /* Task handle. */
+    1                      // pin to core 1 (i2c begin was called from core 1, interrupt has to be processed on core 1)
   );  
 }
 

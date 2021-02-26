@@ -4,29 +4,34 @@
 int getBatt(void);
 void battTask(void * parameter);
 double mapf(double x, double in_min, double in_max, double out_min, double out_max);
+int BattLvl = -1;
 
-void init_batt(void (*onLowBatt)(void)){
+void init_batt(void (*onBattLvlChange)(void)){
   pinMode(BATT_PIN, INPUT);
   
-  xTaskCreate(
+  xTaskCreatePinnedToCore(
     battTask,          /* Task function. */
     "battTask",        /* String with name of task. */
     10000,                 /* Stack size in bytes. */
-    (void*)onLowBatt,       /* Parameter passed as input of the task */
+    (void*)onBattLvlChange,       /* Parameter passed as input of the task */
     1,                     /* Priority of the task. */
-    NULL                  /* Task handle. */
+    NULL,                  /* Task handle. */
+    1                      // pin to core 1 (i2c begin was called from core 1, interrupt has to be processed on core 1)
   );  
 }
 
 void battTask(void * parameter){
-  void (*onLowBatt)(void) = (void (*)(void))parameter;
+  void (*onBattLvlChange)(void) = (void (*)(void))parameter;
+  static int lastBattLvl = -1;
   while(1){
-    if(getBatt() < LOW_BATT_THRES){
-      if(onLowBatt != NULL) onLowBatt();
+    BattLvl = getBatt();
+    if(BattLvl != lastBattLvl){
+      if(onBattLvlChange != NULL) onBattLvlChange();
+      lastBattLvl = BattLvl;
     }
-    else{
-      stopBlink();
-    }
+//    else{
+//      stopBlink();
+//    }
     delay(POLL_INT);
   }
   vTaskDelete(NULL);

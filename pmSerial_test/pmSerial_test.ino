@@ -66,8 +66,9 @@ void setup() {
     display.printFixed(0, 16, "WiFi Failed", STYLE_NORMAL);
   }
   delay(1000);
+  display.clear();
 
-  init_batt(lowBatt);
+  init_batt(onBattLvlChange);
   begin_aq(onStatusChange);
   //init_pm(NULL); //for polling method
 //  init_pm(onStatusChange); //call onStatusChange when air quality status change
@@ -98,6 +99,19 @@ void loop() {
   }
 }
 
+void onBattLvlChange(void){
+  if(BattLvl < LOW_BATT_THRES) 
+    lowBatt();
+  else 
+    stopBlink();
+
+//  display.clear();
+  display.printFixed(0, 8, "                     ", STYLE_NORMAL);//clear line
+  display.printFixed(0, 8, "Battery level: ", STYLE_NORMAL);
+  display.printFixed(15*6, 8, String(BattLvl).c_str(), STYLE_NORMAL);
+  display.printFixed(18*6, 8, "%", STYLE_NORMAL);
+}
+
 void lowBatt(void){
   static unsigned long lastSentMillis = 0;
 //  if( millis()-lastSentMillis >= 600000){ //send warning every 10 mins if low battery
@@ -112,9 +126,10 @@ void lowBatt(void){
 void onStatusChange(void){
   Serial.printf("status changed to: %s\n",air_quality_str.c_str());
 
-  display.clear();
-  display.printFixed(0, 8, "Air quality: ", STYLE_NORMAL);
-  display.printFixed(0, 16, air_quality_str.c_str(), STYLE_NORMAL);
+//  display.clear();
+  display.printFixed(0, 16, "Air quality: ", STYLE_NORMAL);
+  display.printFixed(0, 24, "                     ", STYLE_NORMAL);//clear line
+  display.printFixed(0, 24, air_quality_str.c_str(), STYLE_NORMAL);
 
 //  bot.sendMessage(chat_id, "Air quality: "+air_quality_str, "");
 //  sendAqMsg = 1; //sending message taking too long

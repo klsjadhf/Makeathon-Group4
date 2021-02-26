@@ -10,4 +10,5 @@
   #define LOW_BATT_THRES 10
 
   void init_batt(void (*onLowBatt)(void));
+  extern int BattLvl;
 #endif //_BATT_H_

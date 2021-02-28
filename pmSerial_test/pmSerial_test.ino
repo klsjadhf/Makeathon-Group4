@@ -130,6 +130,13 @@ void onStatusChange(void){
   display.printFixed(0, 16, "Air quality: ", STYLE_NORMAL);
   display.printFixed(0, 24, "                     ", STYLE_NORMAL);//clear line
   display.printFixed(0, 24, air_quality_str.c_str(), STYLE_NORMAL);
+  display.printFixed(0, 32, "                     ", STYLE_NORMAL);//clear line
+  display.printFixed(0, 32, "PM 2.5: ", STYLE_NORMAL);
+  display.printFixed(8*6, 32, String(pms.pm25).c_str(), STYLE_NORMAL);
+  display.printFixed(0, 40, "                     ", STYLE_NORMAL);//clear line
+  display.printFixed(0, 40, "eCO2: ", STYLE_NORMAL);
+  display.printFixed(6*6, 40, String(ccs.geteCO2()).c_str(), STYLE_NORMAL);
+  
 
 //  bot.sendMessage(chat_id, "Air quality: "+air_quality_str, "");
 //  sendAqMsg = 1; //sending message taking too long

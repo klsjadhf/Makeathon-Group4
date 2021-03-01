@@ -1,8 +1,11 @@
 #include "ccs.h"
+#include "lcdgfx.h"
 
 Adafruit_CCS811 ccs;
 
 void read_ccs_task(void * parameter);
+
+extern DisplaySSD1306_128x64_I2C display;
 
 int init_ccs(void){
   Serial.println("init CCS811");
@@ -34,6 +37,9 @@ void read_ccs_task(void * parameter){
           Serial.print("ppm, TVOC: ");
           Serial.println(ccs.getTVOC());
         #endif //CCS_DEBUG
+        display.printFixed(0, 40, "                     ", STYLE_NORMAL);//clear line
+        display.printFixed(0, 40, "eCO2: ", STYLE_NORMAL);
+        display.printFixed(6*6, 40, String(ccs.geteCO2()).c_str(), STYLE_NORMAL);
       }
       else{
         Serial.println("ERROR!");

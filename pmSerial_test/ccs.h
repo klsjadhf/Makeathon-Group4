@@ -4,7 +4,7 @@
   #include <Arduino.h>
   #include <Adafruit_CCS811.h>
   
-  #define CCS_DEBUG 0
+  #define CCS_DEBUG 1
 
 // might need to put ccs811 on different i2c to avoid conflict with oled
 // adafruit lib cannot change pin easily. change oled pin instead

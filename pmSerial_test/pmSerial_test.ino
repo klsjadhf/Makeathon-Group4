@@ -34,11 +34,12 @@ bool sendLowBattMsg = 0;
 OLED_TYPE display(-1,{-1,OLED_ADDR,I2C_SCL,I2C_SDA,I2C_FREQ});
 
 void setup() {  
-  Serial.begin(9600);
+  Serial.begin(250000);
 
   init_led();
 
   display.setFixedFont( ssd1306xled_font6x8 );
+  display.setColor(RGB_COLOR16(0,0,255));
   display.begin();
   display.clear();
 
@@ -97,6 +98,22 @@ void loop() {
     bot.sendMessage(chat_id, "low battery");
     Serial.println("message sent");
   }
+//  if(updateDisplay){
+//    display.clear();
+//    display.printFixed(0, 8, "                     ", STYLE_NORMAL);//clear line
+//    display.printFixed(0, 8, "Battery level: ", STYLE_NORMAL);
+//    display.printFixed(15*6, 8, String(BattLvl).c_str(), STYLE_NORMAL);
+//    display.printFixed(18*6, 8, "%", STYLE_NORMAL);
+//    display.printFixed(0, 16, "Air quality: ", STYLE_NORMAL);
+//    display.printFixed(0, 24, "                     ", STYLE_NORMAL);//clear line
+//    display.printFixed(0, 24, air_quality_str.c_str(), STYLE_NORMAL);
+//    display.printFixed(0, 32, "                     ", STYLE_NORMAL);//clear line
+//    display.printFixed(0, 32, "PM 2.5: ", STYLE_NORMAL);
+//    display.printFixed(8*6, 32, String(pms.pm25).c_str(), STYLE_NORMAL);
+//    display.printFixed(0, 40, "                     ", STYLE_NORMAL);//clear line
+//    display.printFixed(0, 40, "eCO2: ", STYLE_NORMAL);
+//    display.printFixed(6*6, 40, String(ccs.geteCO2()).c_str(), STYLE_NORMAL);
+//  }
 }
 
 void onBattLvlChange(void){
@@ -130,12 +147,12 @@ void onStatusChange(void){
   display.printFixed(0, 16, "Air quality: ", STYLE_NORMAL);
   display.printFixed(0, 24, "                     ", STYLE_NORMAL);//clear line
   display.printFixed(0, 24, air_quality_str.c_str(), STYLE_NORMAL);
-  display.printFixed(0, 32, "                     ", STYLE_NORMAL);//clear line
-  display.printFixed(0, 32, "PM 2.5: ", STYLE_NORMAL);
-  display.printFixed(8*6, 32, String(pms.pm25).c_str(), STYLE_NORMAL);
-  display.printFixed(0, 40, "                     ", STYLE_NORMAL);//clear line
-  display.printFixed(0, 40, "eCO2: ", STYLE_NORMAL);
-  display.printFixed(6*6, 40, String(ccs.geteCO2()).c_str(), STYLE_NORMAL);
+//  display.printFixed(0, 32, "                     ", STYLE_NORMAL);//clear line
+//  display.printFixed(0, 32, "PM 2.5: ", STYLE_NORMAL);
+//  display.printFixed(8*6, 32, String(pms.pm25).c_str(), STYLE_NORMAL);
+//  display.printFixed(0, 40, "                     ", STYLE_NORMAL);//clear line
+//  display.printFixed(0, 40, "eCO2: ", STYLE_NORMAL);
+//  display.printFixed(6*6, 40, String(ccs.geteCO2()).c_str(), STYLE_NORMAL);
   
 
 //  bot.sendMessage(chat_id, "Air quality: "+air_quality_str, "");

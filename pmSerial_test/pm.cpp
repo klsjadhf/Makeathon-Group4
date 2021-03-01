@@ -1,4 +1,5 @@
 #include "pm.h"
+#include "lcdgfx.h"
 
 //HardwareSerial pmSerial(PM_SERIAL);
 //SerialPM pms(PMS5003, pmSerial);
@@ -6,6 +7,8 @@ SerialPM pms(PMS5003, PM_RX, PM_TX);
 
 void read_pm_task(void * parameter);
 void print_pm_error(SerialPM::STATUS pms_status);
+
+extern DisplaySSD1306_128x64_I2C display;
 
 // initalise pm2.5 sensor
 // using the pms5003
@@ -15,13 +18,14 @@ void init_pm(void){
 //  pmSerial.begin(9600, SERIAL_8N1, PM_RX, PM_TX);
   pms.init();
   // create new task to continuously read the pm2.5 sensor and update struct
-  xTaskCreate(
+  xTaskCreatePinnedToCore(
     read_pm_task,          /* Task function. */
     "read_pm_task",        /* String with name of task. */
     10000,                 /* Stack size in bytes. */
     NULL,       /* Parameter passed as input of the task */
     1,                     /* Priority of the task. */
-    NULL                   /* Task handle. */
+    NULL,                   /* Task handle. */
+    1
   );  
   Serial.println("done");
 }
@@ -32,6 +36,11 @@ void read_pm_task(void * parameter){
 //    pms.pm25 = analogRead(34)/15;
 //    Serial.printf("analogread: %d\n",pms.pm25);
     pms.read(); // read the PM s
+    
+    display.printFixed(0, 32, "                     ", STYLE_NORMAL);//clear line
+    display.printFixed(0, 32, "PM 2.5: ", STYLE_NORMAL);
+    display.printFixed(8*6, 32, String(pms.pm25).c_str(), STYLE_NORMAL);
+    
     #if PM_DEBUG
       Serial.print("\nReading PMS5003. Status: ");
       if (pms){ // successfull read sensor

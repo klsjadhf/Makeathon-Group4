@@ -1,5 +1,6 @@
 #include "pm.h"
-#include "lcdgfx.h"
+//#include "lcdgfx.h"
+#include "oled.h"
 
 //HardwareSerial pmSerial(PM_SERIAL);
 //SerialPM pms(PMS5003, pmSerial);
@@ -13,7 +14,7 @@ extern DisplaySSD1306_128x64_I2C display;
 // initalise pm2.5 sensor
 // using the pms5003
 void init_pm(void){
-  Serial.print("init pm... ");
+  Serial.println("init pm... ");
   // initalise serial port for sensor
 //  pmSerial.begin(9600, SERIAL_8N1, PM_RX, PM_TX);
   pms.init();
@@ -37,9 +38,17 @@ void read_pm_task(void * parameter){
 //    Serial.printf("analogread: %d\n",pms.pm25);
     pms.read(); // read the PM s
     
-    display.printFixed(0, 32, "                     ", STYLE_NORMAL);//clear line
-    display.printFixed(0, 32, "PM 2.5: ", STYLE_NORMAL);
-    display.printFixed(8*6, 32, String(pms.pm25).c_str(), STYLE_NORMAL);
+//    display.printFixed(0, 32, "                     ", STYLE_NORMAL);//clear line
+//    display.printFixed(0, 32, "PM 2.5: ", STYLE_NORMAL);
+//    display.printFixed(8*6, 32, String(pms.pm25).c_str(), STYLE_NORMAL);
+    if (pms){ // successfull read sensor
+      String dispOut = "PM 2.5: " + String(pms.pm25) + " ug/m3";
+      oledPrintOnLine(4, dispOut.c_str());
+    }
+    else{
+      oledPrintOnLine(4, "PMS5003 error");
+    }
+    
     
     #if PM_DEBUG
       Serial.print("\nReading PMS5003. Status: ");

@@ -1,5 +1,6 @@
 #include "ccs.h"
-#include "lcdgfx.h"
+//#include "lcdgfx.h"
+#include "oled.h"
 
 Adafruit_CCS811 ccs;
 
@@ -37,12 +38,16 @@ void read_ccs_task(void * parameter){
           Serial.print("ppm, TVOC: ");
           Serial.println(ccs.getTVOC());
         #endif //CCS_DEBUG
-        display.printFixed(0, 40, "                     ", STYLE_NORMAL);//clear line
-        display.printFixed(0, 40, "eCO2: ", STYLE_NORMAL);
-        display.printFixed(6*6, 40, String(ccs.geteCO2()).c_str(), STYLE_NORMAL);
+//        display.printFixed(0, 40, "                     ", STYLE_NORMAL);//clear line
+//        display.printFixed(0, 40, "eCO2: ", STYLE_NORMAL);
+//        display.printFixed(6*6, 40, String(ccs.geteCO2()).c_str(), STYLE_NORMAL);
+          String dispOut = "eCO2: " + String(ccs.geteCO2()) + " ppm";
+          oledPrintOnLine(5, dispOut.c_str());
       }
       else{
         Serial.println("ERROR!");
+        String dispOut = "CCS811 error";
+        oledPrintOnLine(5, dispOut.c_str());
       }
     }
     delay(CCS_R_INT);

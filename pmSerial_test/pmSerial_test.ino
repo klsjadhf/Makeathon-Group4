@@ -2,7 +2,8 @@
 #include "aq.h"
 #include "led.h"
 #include "batt.h"
-#include "lcdgfx.h"
+//#include "lcdgfx.h"
+#include "oled.h"
 #include <WiFi.h>
 #include <WiFiClientSecure.h>
 #include <UniversalTelegramBot.h>
@@ -16,36 +17,41 @@ UniversalTelegramBot bot(BOT_TOKEN, secured_client);
 bool sendAqMsg = 0;
 bool sendLowBattMsg = 0;
 
-// oled
-#define OLED_TYPE DisplaySSD1306_128x64_I2C
-#define OLED_ADDR 0x3C
-//#define I2C_SDA 27
-//#define I2C_SCL 26
-#define I2C_SDA 21
-#define I2C_SCL 22
-#define I2C_FREQ 100000
-/*rstPin, SPlatformI2cConfig{ config.busId,
-                                     static_cast<uint8_t>(config.addr ?: 0x3C),
-                                     config.scl,
-                                     config.sda,
-                                     config.frequency ?: 400000 } ) {}
-                                     */
-
-OLED_TYPE display(-1,{-1,OLED_ADDR,I2C_SCL,I2C_SDA,I2C_FREQ});
+//// oled
+//#define OLED_TYPE DisplaySSD1306_128x64_I2C
+//#define OLED_ADDR 0x3C
+////#define I2C_SDA 27
+////#define I2C_SCL 26
+//#define I2C_SDA 21
+//#define I2C_SCL 22
+//#define I2C_FREQ 400000
+///*rstPin, SPlatformI2cConfig{ config.busId,
+//                                     static_cast<uint8_t>(config.addr ?: 0x3C),
+//                                     config.scl,
+//                                     config.sda,
+//                                     config.frequency ?: 400000 } ) {}
+//                                     */
+//
+//OLED_TYPE display(-1,{-1,OLED_ADDR,I2C_SCL,I2C_SDA,I2C_FREQ});
 
 void setup() {  
   Serial.begin(250000);
 
   init_led();
+  init_oled();
 
-  display.setFixedFont( ssd1306xled_font6x8 );
-  display.setColor(RGB_COLOR16(0,0,255));
-  display.begin();
-  display.clear();
+  display.printFixed(0, 0, "where is this", STYLE_NORMAL);
+  delay(500);
+
+//  display.setFixedFont( ssd1306xled_font6x8 );
+////  display.setColor(RGB_COLOR16(0,0,255));
+//  display.begin();
+//  display.clear();
 
    // attempt to connect to Wifi network:
   Serial.print("Connecting to Wifi \nSSID :");
-  display.printFixed(0, 8, "Connecting WiFi...", STYLE_NORMAL);
+//  display.printFixed(0, 8, "Connecting WiFi...", STYLE_NORMAL);
+  oledPrintOnLine(1, "Connecting WiFi...");
   Serial.print(WIFI_SSID);
   WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
   secured_client.setCACert(TELEGRAM_CERTIFICATE_ROOT); // Add root certificate for api.telegram.org
@@ -59,15 +65,19 @@ void setup() {
   if(WiFi.status() == WL_CONNECTED){
     Serial.print("\nWiFi connected. IP address: ");
     Serial.println(WiFi.localIP());
-    display.printFixed(0, 16, "Connected to: ", STYLE_NORMAL);
-    display.printFixed(0, 24, WIFI_SSID, STYLE_NORMAL);
+//    display.printFixed(0, 16, "Connected to: ", STYLE_NORMAL);
+//    display.printFixed(0, 24, WIFI_SSID, STYLE_NORMAL);
+    oledPrintOnLine(2, "Connected to: ");
+    oledPrintOnLine(3, WIFI_SSID);
   }
   else{
     Serial.print("\nWiFi Failed");
-    display.printFixed(0, 16, "WiFi Failed", STYLE_NORMAL);
+//    display.printFixed(0, 16, "WiFi Failed", STYLE_NORMAL);
+    oledPrintOnLine(2, "WiFi Failed");
   }
   delay(1000);
-  display.clear();
+//  display.clear();
+  clearOled();
 
   init_batt(onBattLvlChange);
   begin_aq(onStatusChange);
@@ -76,6 +86,7 @@ void setup() {
 }
 
 void loop() {
+  static long lastDispMillis = millis();
   //for polling method
 //  if(pms.pm25 < PM_THRES_LOW)
 //    pm_ok();
@@ -85,6 +96,7 @@ void loop() {
 //    pm_warn();
 //  delay(500);
 
+//  oledPrintOnLine(7, "test");
 
   if(sendAqMsg){
     sendAqMsg = 0;
@@ -98,19 +110,16 @@ void loop() {
     bot.sendMessage(chat_id, "low battery");
     Serial.println("message sent");
   }
-//  if(updateDisplay){
+//  if(millis()-lastDispMillis > 1000){
+//    lastDispMillis = millis();
 //    display.clear();
-//    display.printFixed(0, 8, "                     ", STYLE_NORMAL);//clear line
 //    display.printFixed(0, 8, "Battery level: ", STYLE_NORMAL);
 //    display.printFixed(15*6, 8, String(BattLvl).c_str(), STYLE_NORMAL);
 //    display.printFixed(18*6, 8, "%", STYLE_NORMAL);
 //    display.printFixed(0, 16, "Air quality: ", STYLE_NORMAL);
-//    display.printFixed(0, 24, "                     ", STYLE_NORMAL);//clear line
 //    display.printFixed(0, 24, air_quality_str.c_str(), STYLE_NORMAL);
-//    display.printFixed(0, 32, "                     ", STYLE_NORMAL);//clear line
 //    display.printFixed(0, 32, "PM 2.5: ", STYLE_NORMAL);
 //    display.printFixed(8*6, 32, String(pms.pm25).c_str(), STYLE_NORMAL);
-//    display.printFixed(0, 40, "                     ", STYLE_NORMAL);//clear line
 //    display.printFixed(0, 40, "eCO2: ", STYLE_NORMAL);
 //    display.printFixed(6*6, 40, String(ccs.geteCO2()).c_str(), STYLE_NORMAL);
 //  }
@@ -123,10 +132,12 @@ void onBattLvlChange(void){
     stopBlink();
 
 //  display.clear();
-  display.printFixed(0, 8, "                     ", STYLE_NORMAL);//clear line
-  display.printFixed(0, 8, "Battery level: ", STYLE_NORMAL);
-  display.printFixed(15*6, 8, String(BattLvl).c_str(), STYLE_NORMAL);
-  display.printFixed(18*6, 8, "%", STYLE_NORMAL);
+//  display.printFixed(0, 8, "                     ", STYLE_NORMAL);//clear line
+//  display.printFixed(0, 8, "Battery level: ", STYLE_NORMAL);
+//  display.printFixed(15*6, 8, String(BattLvl).c_str(), STYLE_NORMAL);
+//  display.printFixed(18*6, 8, "%", STYLE_NORMAL);
+  String dispOut = "Battery: " + String(BattLvl) + "%";
+  oledPrintOnLine(1, dispOut.c_str());
 }
 
 void lowBatt(void){
@@ -144,16 +155,17 @@ void onStatusChange(void){
   Serial.printf("status changed to: %s\n",air_quality_str.c_str());
 
 //  display.clear();
-  display.printFixed(0, 16, "Air quality: ", STYLE_NORMAL);
-  display.printFixed(0, 24, "                     ", STYLE_NORMAL);//clear line
-  display.printFixed(0, 24, air_quality_str.c_str(), STYLE_NORMAL);
+//  display.printFixed(0, 16, "Air quality: ", STYLE_NORMAL);
+//  display.printFixed(0, 24, "                     ", STYLE_NORMAL);//clear line
+//  display.printFixed(0, 24, air_quality_str.c_str(), STYLE_NORMAL);
 //  display.printFixed(0, 32, "                     ", STYLE_NORMAL);//clear line
 //  display.printFixed(0, 32, "PM 2.5: ", STYLE_NORMAL);
 //  display.printFixed(8*6, 32, String(pms.pm25).c_str(), STYLE_NORMAL);
 //  display.printFixed(0, 40, "                     ", STYLE_NORMAL);//clear line
 //  display.printFixed(0, 40, "eCO2: ", STYLE_NORMAL);
 //  display.printFixed(6*6, 40, String(ccs.geteCO2()).c_str(), STYLE_NORMAL);
-  
+  oledPrintOnLine(2, "Air quality: ");
+  oledPrintOnLine(3, air_quality_str.c_str());
 
 //  bot.sendMessage(chat_id, "Air quality: "+air_quality_str, "");
 //  sendAqMsg = 1; //sending message taking too long

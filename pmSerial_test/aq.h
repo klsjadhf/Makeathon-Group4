@@ -5,7 +5,7 @@
   #include "pm.h"
   #include "ccs.h"
 
-  #define AQ_DEBUG 1
+  #define AQ_DEBUG 0
 
   enum AIR_QUALITY{
     AQ_ERROR = -1,

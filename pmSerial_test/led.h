@@ -3,7 +3,7 @@
 
   #include <Arduino.h>
 
-  #define LED_DEBUG 1
+  #define LED_DEBUG 0
   
   //pins for rgb led
   #define LED_R 13

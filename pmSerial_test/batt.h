@@ -3,7 +3,7 @@
 
   #include <Arduino.h>
 
-  #define BATT_DEBUG 1
+  #define BATT_DEBUG 0
 
   #define BATT_PIN 35
   #define POLL_INT 10000 //ms between each check

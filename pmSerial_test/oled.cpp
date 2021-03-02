@@ -38,15 +38,17 @@ void init_oled(void){
 
 void disp_oled_task(void * parameter){
   while(1){
-    #ifdef OLED_DEBUG
+    #if OLED_DEBUG
     Serial.println("disp on oled");
     #endif //OLED_DEBUG
 
     while(writingBuffer){
+      #if OLED_DEBUG
       Serial.println("oled waiting");
+      #endif //OLED_DEBUG
     }
     xSemaphoreTake( i2cMux, portMAX_DELAY );
-    display.clear();
+//    display.clear();
     for(int i=0; i<8; i++){
       display.printFixed(0, 8*(i+1), dispBuffer[i], STYLE_NORMAL);
     }
@@ -58,15 +60,30 @@ void disp_oled_task(void * parameter){
 }
 
 void oledPrintOnLine(int line, char const* str){
+  line--;
+  int i = 0;
   writingBuffer = 1;
 //  vTaskSuspend(oledTaskHandle);
-  strcpy(dispBuffer[line-1], str);
+  strcpy(dispBuffer[line], str);
+  for(size_t i=0; i<21-strlen(str); i++){
+    strcat(dispBuffer[line], " ");
+  }
 //  vTaskResume(oledTaskHandle);
   writingBuffer = 0;
+  #if OLED_DEBUG
+  Serial.println(dispBuffer[line]);
+  #endif //OLED_DEBUG
 }
 
 void clearOled(void){
+  writingBuffer = 1;
   for(int i=0; i<8; i++){
-    dispBuffer[i][0] = 0;
+    for(int j=0; j<21; j++){
+      dispBuffer[i][0] = '\0';
+    }
   }
+  writingBuffer = 0;
+  xSemaphoreTake( i2cMux, portMAX_DELAY );
+  display.clear();
+  xSemaphoreGive(i2cMux);
 }

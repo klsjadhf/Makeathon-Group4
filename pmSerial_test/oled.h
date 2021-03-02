@@ -4,9 +4,9 @@
   #include <Arduino.h>
   #include <lcdgfx.h>
 
-  #define OLED_DEBUG 1
+  #define OLED_DEBUG 0
 
-  #define REFRESH_RATE 1
+  #define REFRESH_RATE 15
   #define REPRESH_PERIOD ((1/REFRESH_RATE)*1000)
   
   // oled

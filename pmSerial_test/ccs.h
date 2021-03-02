@@ -16,6 +16,7 @@
   #define CCS_R_INT 500
 
   extern Adafruit_CCS811 ccs;
+  extern bool ccsError;
 
   int init_ccs(void);
 

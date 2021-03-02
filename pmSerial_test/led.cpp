@@ -13,6 +13,7 @@ void init_led(void){
   pinMode(LED_R, OUTPUT);
   pinMode(LED_G, OUTPUT);
   pinMode(LED_B, OUTPUT);
+  
   digitalWrite(LED_R, LED_OFF);
   digitalWrite(LED_G, LED_OFF);
   digitalWrite(LED_B, LED_OFF);

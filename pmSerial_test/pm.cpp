@@ -15,6 +15,7 @@ extern DisplaySSD1306_128x64_I2C display;
 // using the pms5003
 void init_pm(void){
   Serial.println("init pm... ");
+  oledPrintOnLine(4, "Init PMS5003");
   // initalise serial port for sensor
 //  pmSerial.begin(9600, SERIAL_8N1, PM_RX, PM_TX);
   pms.init();

@@ -17,6 +17,8 @@ UniversalTelegramBot bot(BOT_TOKEN, secured_client);
 bool sendAqMsg = 0;
 bool sendLowBattMsg = 0;
 
+SemaphoreHandle_t i2cMux;
+
 //// oled
 //#define OLED_TYPE DisplaySSD1306_128x64_I2C
 //#define OLED_ADDR 0x3C
@@ -37,11 +39,10 @@ bool sendLowBattMsg = 0;
 void setup() {  
   Serial.begin(250000);
 
+  i2cMux = xSemaphoreCreateMutex();
+
   init_led();
   init_oled();
-
-  display.printFixed(0, 0, "where is this", STYLE_NORMAL);
-  delay(500);
 
 //  display.setFixedFont( ssd1306xled_font6x8 );
 ////  display.setColor(RGB_COLOR16(0,0,255));

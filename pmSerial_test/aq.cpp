@@ -118,6 +118,10 @@ AIR_QUALITY cal_PM_quality(uint16_t pm25_reading, uint16_t pm10_reading){
 }
 
 AIR_QUALITY cal_voc_quality(uint16_t eco2, uint16_t tvoc){
+  if(ccsError){
+    eco2 = 0;
+    tvoc = 0;
+  }
   AIR_QUALITY aq;
   int i,j;
   const int thres_num = 3;

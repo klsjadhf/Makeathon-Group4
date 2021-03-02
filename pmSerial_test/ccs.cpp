@@ -3,18 +3,26 @@
 #include "oled.h"
 
 Adafruit_CCS811 ccs;
+bool ccsError = 0;
+
+extern SemaphoreHandle_t i2cMux;
+extern DisplaySSD1306_128x64_I2C display;
 
 void read_ccs_task(void * parameter);
 
-extern DisplaySSD1306_128x64_I2C display;
 
 int init_ccs(void){
   Serial.println("init CCS811");
+  oledPrintOnLine(5, "Init CCS811");
 
+  xSemaphoreTake( i2cMux, portMAX_DELAY );
   if(!ccs.begin()){
+    xSemaphoreGive(i2cMux);
     Serial.println("Failed to start sensor! Please check your wiring.");
+    oledPrintOnLine(5, "CCS811 init failed");
     return -1;
   }
+  xSemaphoreGive(i2cMux);
 
   xTaskCreatePinnedToCore(
     read_ccs_task,          /* Task function. */
@@ -30,8 +38,10 @@ int init_ccs(void){
 
 void read_ccs_task(void * parameter){
   while(1){
+    xSemaphoreTake( i2cMux, portMAX_DELAY );
     if(ccs.available()){
       if(!ccs.readData()){
+        ccsError = 0;
         #if CCS_DEBUG
           Serial.print("CO2: ");
           Serial.print(ccs.geteCO2());
@@ -45,11 +55,13 @@ void read_ccs_task(void * parameter){
           oledPrintOnLine(5, dispOut.c_str());
       }
       else{
+        ccsError = 1;
         Serial.println("ERROR!");
         String dispOut = "CCS811 error";
         oledPrintOnLine(5, dispOut.c_str());
       }
     }
+    xSemaphoreGive(i2cMux);
     delay(CCS_R_INT);
   }
   vTaskDelete(NULL);

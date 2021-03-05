@@ -1,9 +1,6 @@
 #include "pm.h"
-//#include "lcdgfx.h"
 #include "oled.h"
 
-//HardwareSerial pmSerial(PM_SERIAL);
-//SerialPM pms(PMS5003, pmSerial);
 SerialPM pms(PMS5003, PM_RX, PM_TX);
 
 void read_pm_task(void * parameter);
@@ -11,13 +8,11 @@ void print_pm_error(SerialPM::STATUS pms_status);
 
 extern DisplaySSD1306_128x64_I2C display;
 
-// initalise pm2.5 sensor
-// using the pms5003
+// initalise pms5003 sensor
 void init_pm(void){
   Serial.println("init pm... ");
   oledPrintOnLine(4, "Init PMS5003");
   // initalise serial port for sensor
-//  pmSerial.begin(9600, SERIAL_8N1, PM_RX, PM_TX);
   pms.init();
   // create new task to continuously read the pm2.5 sensor and update struct
   xTaskCreate(
@@ -33,14 +28,8 @@ void init_pm(void){
 
 void read_pm_task(void * parameter){
   while(1){
-//    void (*onStatusChange)(void) = (void (*)(void))parameter;
-//    pms.pm25 = analogRead(34)/15;
-//    Serial.printf("analogread: %d\n",pms.pm25);
     pms.read(); // read the PM s
     
-//    display.printFixed(0, 32, "                     ", STYLE_NORMAL);//clear line
-//    display.printFixed(0, 32, "PM 2.5: ", STYLE_NORMAL);
-//    display.printFixed(8*6, 32, String(pms.pm25).c_str(), STYLE_NORMAL);
     if (pms){ // successfull read sensor
       String dispOut = "PM 2.5: " + String(pms.pm25) + " ug/m3";
       oledPrintOnLine(4, dispOut.c_str());
@@ -65,11 +54,6 @@ void read_pm_task(void * parameter){
       else
         print_pm_error(pms.status);
     #endif //PM_DEBUG
-//    cal_AQ(pms.pm25, pms.pm10);
-//    if(last_air_quality_status != air_quality_status){
-//      last_air_quality_status = air_quality_status;
-//      if(onStatusChange != NULL) onStatusChange();
-//    }
     delay(PM_R_INT);
   }
   vTaskDelete(NULL);

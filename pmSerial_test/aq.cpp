@@ -39,7 +39,6 @@ void check_status_task(void * parameter){
 //
 //    air_quality_status = cal_voc_quality(inVal, 0);
   
-//    cal_AQ(pms.pm25, pms.pm10);
     air_quality_status = max(cal_PM_quality(pms.pm25, pms.pm10), cal_voc_quality(ccs.geteCO2(), ccs.getTVOC()));
     air_quality_str = AQtoS(air_quality_status);
 
@@ -87,27 +86,6 @@ AIR_QUALITY cal_PM_quality(uint16_t pm25_reading, uint16_t pm10_reading){
     }
   }
   aq = (AIR_QUALITY)(i-1);
-  
-//  if(PSI<psi[1]){
-//    air_quality_str = "Good";
-//    air_quality_status = GOOD;
-//  }
-//  else if(PSI<psi[2]){
-//    air_quality_str = "Moderate";
-//    air_quality_status = MODERATE;
-//  }
-//  else if(PSI<psi[3]){
-//    air_quality_str = "Unhealthy";
-//    air_quality_status = UNHEALTHY;
-//  }
-//  else if(PSI<psi[4]){
-//    air_quality_str = "Very Unhealthy";
-//    air_quality_status = V_UNHEALTHY;
-//  }
-//  else{
-//    air_quality_str = "Hazardous";
-//    air_quality_status = HAZARDOUS;
-//  }
 
   #if AQ_DEBUG 
     Serial.printf("pm25_sub: %d, pm10_sub: %d, PSI: %d\n", pm25_sub, pm10_sub, PSI);

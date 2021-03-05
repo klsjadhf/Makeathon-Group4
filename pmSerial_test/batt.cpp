@@ -28,9 +28,6 @@ void battTask(void * parameter){
       if(onBattLvlChange != NULL) onBattLvlChange();
       lastBattLvl = BattLvl;
     }
-//    else{
-//      stopBlink();
-//    }
     delay(POLL_INT);
   }
   vTaskDelete(NULL);

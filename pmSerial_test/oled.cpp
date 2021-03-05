@@ -17,7 +17,6 @@ void init_oled(void){
 
   xSemaphoreTake( i2cMux, portMAX_DELAY );
   display.setFixedFont( ssd1306xled_font6x8 );
-//  display.setColor(RGB_COLOR16(0,0,255));
   display.begin();
   display.clear();
   display.printFixed(0, 8, "Hello!", STYLE_NORMAL);
@@ -48,7 +47,6 @@ void disp_oled_task(void * parameter){
       #endif //OLED_DEBUG
     }
     xSemaphoreTake( i2cMux, portMAX_DELAY );
-//    display.clear();
     for(int i=0; i<8; i++){
       display.printFixed(0, 8*(i+1), dispBuffer[i], STYLE_NORMAL);
     }
@@ -63,12 +61,10 @@ void oledPrintOnLine(int line, char const* str){
   line--;
   int i = 0;
   writingBuffer = 1;
-//  vTaskSuspend(oledTaskHandle);
   strcpy(dispBuffer[line], str);
   for(size_t i=0; i<21-strlen(str); i++){
     strcat(dispBuffer[line], " ");
   }
-//  vTaskResume(oledTaskHandle);
   writingBuffer = 0;
   #if OLED_DEBUG
   Serial.println(dispBuffer[line]);

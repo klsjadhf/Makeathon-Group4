@@ -18,6 +18,7 @@
 
   extern String air_quality_str;
   extern AIR_QUALITY air_quality_status;
+  extern int PSI;
 
   void begin_aq(void (*onChange)(void));
 

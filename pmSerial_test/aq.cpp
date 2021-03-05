@@ -3,6 +3,7 @@
 String air_quality_str = "";
 AIR_QUALITY air_quality_status = AQ_ERROR;
 AIR_QUALITY last_air_quality_status = AQ_ERROR;
+int PSI = -1;
 
 void check_status_task(void * parameter);
 AIR_QUALITY cal_PM_quality(uint16_t pm25_reading, uint16_t pm10_reading);
@@ -75,7 +76,7 @@ AIR_QUALITY cal_PM_quality(uint16_t pm25_reading, uint16_t pm10_reading){
   }
   int pm10_sub = round(((float)(psi[i]-psi[i-1])/(float)(pm10[i]-pm10[i-1]))*(float)(pm10_reading-pm10[i-1]))+psi[i-1];
 
-  int PSI = max(pm25_sub, pm10_sub);
+  PSI = max(pm25_sub, pm10_sub);
 
   for(i=1; i<=5; i++){
     if(PSI<psi[i]){

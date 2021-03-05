@@ -95,6 +95,9 @@ void onStatusChange(void){
 
   oledPrintOnLine(2, "Air quality: ");
   oledPrintOnLine(3, air_quality_str.c_str());
+
+  String dispOut = "PSI: " + String(PSI);
+  oledPrintOnLine(5, dispOut.c_str());
   
   if(air_quality_status == GOOD)
     pm_ok();

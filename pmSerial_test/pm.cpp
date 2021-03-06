@@ -31,8 +31,8 @@ void read_pm_task(void * parameter){
     pms.read(); // read the PM s
     
     if (pms){ // successfull read sensor
-      String dispOut = "PM 2.5: " + String(pms.pm25) + " ug/m3";
-      oledPrintOnLine(4, dispOut.c_str());
+//      String dispOut = "PM 2.5: " + String(pms.pm25) + " ug/m3";
+//      oledPrintOnLine(4, dispOut.c_str());
     }
     else{
       oledPrintOnLine(4, "PMS5003 error");

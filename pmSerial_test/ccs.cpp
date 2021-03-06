@@ -22,6 +22,8 @@ int init_ccs(void){
     return -1;
   }
   xSemaphoreGive(i2cMux);
+  
+//  delay(100);
 
   xTaskCreatePinnedToCore(
     read_ccs_task,          /* Task function. */
@@ -39,7 +41,8 @@ void read_ccs_task(void * parameter){
   while(1){
     xSemaphoreTake( i2cMux, portMAX_DELAY );
     if(ccs.available()){
-      if(!ccs.readData()){
+      ccs.readData();
+//      if(!ccs.readData()){
         ccsError = 0;
         #if CCS_DEBUG
           Serial.print("CO2: ");
@@ -49,13 +52,15 @@ void read_ccs_task(void * parameter){
         #endif //CCS_DEBUG
           String dispOut = "eCO2: " + String(ccs.geteCO2()) + " ppm";
           oledPrintOnLine(5, dispOut.c_str());
-      }
-      else{
-        ccsError = 1;
-        Serial.println("ERROR!");
-        String dispOut = "CCS811 error";
-        oledPrintOnLine(5, dispOut.c_str());
-      }
+          dispOut = "tVOC: " + String(ccs.getTVOC()) + " ppb";
+          oledPrintOnLine(6, dispOut.c_str());
+//      }
+//      else{
+//        ccsError = 1;
+//        Serial.println("ERROR!");
+//        String dispOut = "CCS811 error";
+//        oledPrintOnLine(5, dispOut.c_str());
+//      }
     }
     xSemaphoreGive(i2cMux);
     delay(CCS_R_INT);

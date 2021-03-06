@@ -81,8 +81,8 @@ void onBattLvlChange(void){
 
 void lowBatt(void){
   static unsigned long lastSentMillis = 0;
-  if( millis()-lastSentMillis >= 600000){ //send warning every 10 mins if low battery
-//  if( millis()-lastSentMillis >= 20000){
+//  if( millis()-lastSentMillis >= 600000){ //send warning every 10 mins if low battery
+  if( millis()-lastSentMillis >= 20000){
     Serial.println("low battery");
     bot.sendMessage(chat_id, "low battery");
     sendLowBattMsg = 1;
@@ -97,7 +97,7 @@ void onStatusChange(void){
   oledPrintOnLine(3, air_quality_str.c_str());
 
   String dispOut = "PSI: " + String(PSI);
-  oledPrintOnLine(5, dispOut.c_str());
+  oledPrintOnLine(6, dispOut.c_str());
   
   if(air_quality_status == GOOD)
     pm_ok();
@@ -110,10 +110,13 @@ void onStatusChange(void){
 void pm_ok(void){
   Serial.println("pm ok");
   setLed(LED_GREEN);
+  sendAqMsg = 0;
 }
+
 void pm_warn(void){
   Serial.println("pm warning");
   setLed(LED_YELLOW);
+  sendAqMsg = 0;
 }
 
 void pm_danger(void){

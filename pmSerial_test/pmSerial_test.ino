@@ -5,6 +5,7 @@
 #include "oled.h"
 #include <WiFi.h>
 #include <WiFiClientSecure.h>
+#include "ota.h"
 #include <UniversalTelegramBot.h>
 
 WiFiClientSecure secured_client;
@@ -45,6 +46,7 @@ void setup() {
     Serial.print("\nWiFi Failed");
     oledPrintOnLine(2, "WiFi Failed");
   }
+  start_ota_server();
   delay(1000);
   clearOled();
 
@@ -67,6 +69,8 @@ void loop() {
     bot.sendMessage(chat_id, "low battery");
     Serial.println("message sent");
   }
+
+//  ota_task();
 }
 
 void onBattLvlChange(void){
